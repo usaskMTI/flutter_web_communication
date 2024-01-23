@@ -11,15 +11,16 @@ app.use(express.json());
 
 let lastMessage = "No message received yet";
 
-app.get('/', (req, res) => {
-  res.send('Hello from Express!');
-});
 app.post('/send-data', (req, res) => {
   const { text } = req.body;
   console.log('Received text:', text);
-  lastMessage = text;
+  lastMessage = text; // Store the received text
   eventEmitter.emit('newData'); // Emit an event for new data
   res.json({ message: 'Received the text!' });
+});
+
+app.get('/get-latest-message', (req, res) => {
+  res.json({ message: lastMessage });
 });
 
 app.get('/events', (req, res) => {
@@ -37,13 +38,11 @@ app.get('/events', (req, res) => {
     eventEmitter.removeListener('newData', sendEvent);
     res.end();
   });
-  res.write(`data: ${JSON.stringify({ message: lastMessage })}\n\n`);
 });
 
 app.get('/test', (req, res) => {
   res.json({ message: 'Test successful' });
 });
-
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
