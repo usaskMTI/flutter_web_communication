@@ -17,32 +17,40 @@ app.get('/', (req, res) => {
 });
 
 app.post('/send-data', (req, res) => {
-  // Assuming the entire order data is sent in the request body
-  const orderData = req.body;
+  console.log('Received body:', req.body); // Log the entire body to see what's inside
+  console.log('Received headers:', req.headers); // Also, log headers to check content-type
 
-  // Processing and storing only the necessary parts of the order
-  const processedData = {
-    id: orderData.id,
-    status: orderData.status,
-    date_created: orderData.date_created,
-    total: orderData.total,
-    customer_details: {
-      email: orderData.billing.email,
-      phone: orderData.billing.phone
-    },
-    items: orderData.line_items.map(item => ({
-      name: item.name,
-      quantity: item.quantity,
-      price: item.price
-    }))
-  };
-
-  lastMessage = JSON.stringify(processedData); // Store the processed order data
-  eventEmitter.emit('newData'); // Emit an event for new data
-
-  res.json({ message: 'Order data received!' });
+  // If there is data, process it, otherwise send an error response
+  if (req.body) {
+    // Process your data here
+    eventEmitter.emit('newData', req.body); // Emit the event with the data
+    res.json({ message: 'Order data received!' });
+  } else {
+    res.status(400).send('No data received');
+  }
 });
 
+
+app.get('/get-latest-message', (req, res) => {
+  res.json({ message: lastMessage });
+});
+
+app.get('/events', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+
+  const sendEvent = () => {
+    res.write(`data: ${JSON.stringify({ message: lastMessage })}\n\n`);
+  };
+
+  eventEmitter.on('newData', sendEvent);
+
+  req.on('close', () => {
+    eventEmitter.removeListener('newData', sendEvent);
+    res.end();
+  });
+});
 
 app.get('/test', (req, res) => {
   res.json({ message: 'Test successful' });

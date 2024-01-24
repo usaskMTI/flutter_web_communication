@@ -34,7 +34,10 @@ class _SSEDemoPageState extends State<SSEDemoPage> {
   }
 
   void listenForServerEvents() {
-    final eventSource = EventSource('http://localhost:5001/events');
+    // final eventSource = EventSource('http://localhost:5001/events');
+    final eventSource =
+        EventSource('https://7468-174-2-250-68.ngrok-free.app/events');
+
     eventSource.onMessage.listen((event) {
       final data = json.decode(event.data);
       setState(() {
