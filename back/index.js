@@ -14,11 +14,16 @@ app.get('/', (req, res) => {
 
 app.post('/send-data', (req, res) => {
   console.log(`Request received at ${new Date().toLocaleString()}`);
-  
-  // Emitting a simple message instead of order details
-  eventEmitter.emit('newData', { message: 'Order received' });
-  res.json({ message: 'Order received notification sent!' });
+
+  if (req.body) {
+    // Emitting the entire order data
+    eventEmitter.emit('newData', req.body);
+    res.json({ message: 'Order details sent!' });
+  } else {
+    res.status(400).send('No order data received');
+  }
 });
+
 
 app.get('/events', (req, res) => {
   res.setHeader('Content-Type', 'text/event-stream');

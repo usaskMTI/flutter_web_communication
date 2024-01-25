@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:html';
 import 'package:flutter/material.dart';
+import 'order_class.dart'; // Make sure this import is correct based on your project structure
 
 void main() {
   runApp(MyApp());
@@ -25,7 +26,7 @@ class SSEDemoPage extends StatefulWidget {
 }
 
 class _SSEDemoPageState extends State<SSEDemoPage> {
-  String _data = 'No data received yet';
+  Order? _order; // Replace String _data with an Order object
 
   @override
   void initState() {
@@ -34,45 +35,44 @@ class _SSEDemoPageState extends State<SSEDemoPage> {
   }
 
   void listenForServerEvents() {
-    // final eventSource =
-    //     EventSource('https://70e8-174-2-250-68.ngrok-free.app/events');
     final eventSource = EventSource('http://localhost:5001/events');
 
     eventSource.onMessage.listen((event) {
+      final rawData = json.decode(event.data);
       setState(() {
-        debugPrint('Received event: $event');
-        _data = 'Order received'; // Update text when an event is received
+        debugPrint('Received raw data: $rawData');
+        _order =
+            Order.fromJson(rawData); // Parse the raw data into an Order object
       });
     }, onError: (error) {
       debugPrint('Error in SSE connection: $error');
       setState(() {
-        _data = 'Error in receiving data'; // Update text on error
+        // Handle the error state
       });
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    // Update the UI to display the order details using the _order object
     return Scaffold(
       appBar: AppBar(
-        title: Text('Flutter SSE Demo'),
+        title: Text('Order Details'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Latest Data from Server:',
-              style: Theme.of(context).textTheme.headline6,
+      body: _order == null
+          ? Center(child: Text('Waiting for order data...'))
+          : ListView(
+              children: [
+                Text('Order #${_order!.id}'),
+                Text('Status: ${_order!.status}'),
+                Text('Total: ${_order!.total}'),
+                ..._order!.items.map((item) => ListTile(
+                      title: Text(item.name),
+                      subtitle: Text('Quantity: ${item.quantity}'),
+                      trailing: Text('\$${item.total}'),
+                    )),
+              ],
             ),
-            SizedBox(height: 20),
-            Text(
-              _data,
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
