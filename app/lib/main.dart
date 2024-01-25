@@ -34,14 +34,19 @@ class _SSEDemoPageState extends State<SSEDemoPage> {
   }
 
   void listenForServerEvents() {
-    // final eventSource = EventSource('http://localhost:5001/events');
-    final eventSource =
-        EventSource('https://7468-174-2-250-68.ngrok-free.app/events');
+    // final eventSource =
+    //     EventSource('https://70e8-174-2-250-68.ngrok-free.app/events');
+    final eventSource = EventSource('http://localhost:5001/events');
 
     eventSource.onMessage.listen((event) {
-      final data = json.decode(event.data);
       setState(() {
-        _data = data['message'];
+        debugPrint('Received event: $event');
+        _data = 'Order received'; // Update text when an event is received
+      });
+    }, onError: (error) {
+      debugPrint('Error in SSE connection: $error');
+      setState(() {
+        _data = 'Error in receiving data'; // Update text on error
       });
     });
   }
