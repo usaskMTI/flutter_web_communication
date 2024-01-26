@@ -1,49 +1,52 @@
 const express = require('express');
+const WebSocket = require('ws');
+const http = require('http');
 const cors = require('cors');
-const events = require('events');
-const { time } = require('console');
-const eventEmitter = new events.EventEmitter();
 
 const app = express();
-app.use(cors());
 app.use(express.json());
+var lastMsg = 'No message yet';
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+app.use(cors());
+const date = new Date();
+
+wss.on('connection', function connection(ws) {
+  ws.on('message', function incoming(message) {
+    console.log('received: %s', message);
+  });
+
+  // You can also send messages to the client from here
+  // ws.send('something from the server');
+});
+
+app.post('/send-data', (req, res) => {
+  // Assuming you receive order data from WooCommerce webhook here
+  const orderData = req.body;
+  console.log(orderData);
+  //console data and time stamp
+  
+  console.log(date);
+  
+  lastMsg = orderData;
+  // Broadcast to all connected WebSocket clients
+  wss.clients.forEach(function each(client) {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify(orderData));
+    }
+  });
+
+  res.status(200).send('Data received');
+});
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
 
-app.post('/send-data', (req, res) => {
-  console.log(`Request received at ${new Date().toLocaleString()}`);
-
-  if (req.body) {
-    // Emitting the entire order data
-    eventEmitter.emit('newData', req.body);
-    res.json({ message: 'Order details sent!' });
-  } else {
-    res.status(400).send('No order data received');
-  }
+app.get('/last-msg', (req, res) => {
+  res.send(lastMsg);
 });
 
-
-app.get('/events', (req, res) => {
-  res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader('Connection', 'keep-alive');
-  const sendEvent = (data) => {
-    res.write(`data: ${JSON.stringify(data)}\n\n`);
-  };
-
-  eventEmitter.on('newData', sendEvent);
-
-  req.on('close', () => {
-    eventEmitter.removeListener('newData', sendEvent);
-    res.end();
-  });
-});
-
-app.get('/test', (req, res) => {
-  res.json({ message: 'Test successful' });
-});
 
 const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

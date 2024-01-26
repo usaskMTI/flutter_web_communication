@@ -18,6 +18,10 @@ collection
 2.18
 file:///Users/MdTousifIslam/.pub-cache/hosted/pub.dev/collection-1.18.0/
 file:///Users/MdTousifIslam/.pub-cache/hosted/pub.dev/collection-1.18.0/lib/
+crypto
+2.19
+file:///Users/MdTousifIslam/.pub-cache/hosted/pub.dev/crypto-3.0.3/
+file:///Users/MdTousifIslam/.pub-cache/hosted/pub.dev/crypto-3.0.3/lib/
 cupertino_icons
 2.19
 file:///Users/MdTousifIslam/.pub-cache/hosted/pub.dev/cupertino_icons-1.0.6/
@@ -94,6 +98,10 @@ web
 3.2
 file:///Users/MdTousifIslam/.pub-cache/hosted/pub.dev/web-0.3.0/
 file:///Users/MdTousifIslam/.pub-cache/hosted/pub.dev/web-0.3.0/lib/
+web_socket_channel
+2.15
+file:///Users/MdTousifIslam/.pub-cache/hosted/pub.dev/web_socket_channel-2.4.0/
+file:///Users/MdTousifIslam/.pub-cache/hosted/pub.dev/web_socket_channel-2.4.0/lib/
 app
 3.2
 file:///Users/MdTousifIslam/Development/flutter-react/app/

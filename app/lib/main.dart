@@ -1,7 +1,5 @@
-import 'dart:convert';
-import 'dart:html';
 import 'package:flutter/material.dart';
-import 'order_class.dart'; // Make sure this import is correct based on your project structure
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 void main() {
   runApp(MyApp());
@@ -11,68 +9,53 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter SSE Demo',
+      title: 'WebSocket Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: SSEDemoPage(),
+      home: WebSocketDemoPage(),
     );
   }
 }
 
-class SSEDemoPage extends StatefulWidget {
+class WebSocketDemoPage extends StatefulWidget {
   @override
-  _SSEDemoPageState createState() => _SSEDemoPageState();
+  _WebSocketDemoPageState createState() => _WebSocketDemoPageState();
 }
 
-class _SSEDemoPageState extends State<SSEDemoPage> {
-  Order? _order; // Replace String _data with an Order object
+class _WebSocketDemoPageState extends State<WebSocketDemoPage> {
+  late WebSocketChannel channel;
+  String _data = 'Waiting for data...';
 
   @override
   void initState() {
     super.initState();
-    listenForServerEvents();
-  }
+    channel = WebSocketChannel.connect(
+      Uri.parse('ws://localhost:5001'),
+    );
 
-  void listenForServerEvents() {
-    final eventSource = EventSource('http://localhost:5001/events');
-
-    eventSource.onMessage.listen((event) {
-      final rawData = json.decode(event.data);
+    channel.stream.listen((data) {
       setState(() {
-        debugPrint('Received raw data: $rawData');
-        _order =
-            Order.fromJson(rawData); // Parse the raw data into an Order object
-      });
-    }, onError: (error) {
-      debugPrint('Error in SSE connection: $error');
-      setState(() {
-        // Handle the error state
+        _data = data;
       });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // Update the UI to display the order details using the _order object
     return Scaffold(
       appBar: AppBar(
-        title: Text('Order Details'),
+        title: Text('WebSocket Data'),
       ),
-      body: _order == null
-          ? Center(child: Text('Waiting for order data...'))
-          : ListView(
-              children: [
-                Text('Order #${_order!.id}'),
-                Text('Status: ${_order!.status}'),
-                Text('Total: ${_order!.total}'),
-                ..._order!.items.map((item) => ListTile(
-                      title: Text(item.name),
-                      subtitle: Text('Quantity: ${item.quantity}'),
-                      trailing: Text('\$${item.total}'),
-                    )),
-              ],
-            ),
+      body: Center(
+        child: Text(_data),
+      ),
     );
+  }
+
+  @override
+  void dispose() {
+    channel.sink.close();
+    super.dispose();
   }
 }

@@ -32,6 +32,12 @@
       "languageVersion": "2.18"
     },
     {
+      "name": "crypto",
+      "rootUri": "file:///Users/MdTousifIslam/.pub-cache/hosted/pub.dev/crypto-3.0.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
       "name": "cupertino_icons",
       "rootUri": "file:///Users/MdTousifIslam/.pub-cache/hosted/pub.dev/cupertino_icons-1.0.6",
       "packageUri": "lib/",
@@ -164,13 +170,19 @@
       "languageVersion": "3.2"
     },
     {
+      "name": "web_socket_channel",
+      "rootUri": "file:///Users/MdTousifIslam/.pub-cache/hosted/pub.dev/web_socket_channel-2.4.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.15"
+    },
+    {
       "name": "app",
       "rootUri": "../",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     }
   ],
-  "generated": "2024-01-23T05:36:39.310371Z",
+  "generated": "2024-01-26T03:38:46.835501Z",
   "generator": "pub",
   "generatorVersion": "3.2.5"
 }
